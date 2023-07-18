@@ -1,7 +1,14 @@
+import { ChatGPTMessage } from "@/lib/openai-stream";
 import { MessageArraySchema } from "@/lib/validators/message"
 
 export async function POST(req: Request){
+    console.log("Route hit")
     const { messages } =  await req.json()
 
-    const parsedMessages = MessageArraySchema.parse(messages)
+    const parsedMessages = MessageArraySchema.parse(messages);
+
+    const outboundMessages: ChatGPTMessage[] = parsedMessages.map((message) => ({
+        role: message.isUserMessage ? 'user' : 'system',
+        content: message.text,
+    }))
 }
