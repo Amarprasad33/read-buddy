@@ -47,7 +47,9 @@ export async function OpenAIStream(payload: OpenAIStreamPayload){
 
                     try {
                         const json = JSON.parse(data);
+                        console.log('json', json);
                         const text = json.choices[0].delta?.content || '';
+                        console.log('text', text)
 
                         if(counter < 2 && (text.match(/n/) || []).length){
                             return
@@ -69,8 +71,11 @@ export async function OpenAIStream(payload: OpenAIStreamPayload){
             for await (const chunk of res.body as any){
                 parser.feed(decoder.decode(chunk))
             } 
-            // Destructuring the data stream from OpenAI
+            
+
         },
     })
+
+    return stream;
 }
 
