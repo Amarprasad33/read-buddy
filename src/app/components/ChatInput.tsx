@@ -14,16 +14,17 @@ const ChatInput: FC<ChatInputProps> = ({className, ...props}) => {
     const [input, setInput] = useState<string>('');
     
     const {mutate: sendMessage, isLoading} = useMutation({
+     
         mutationFn: async (message: Message) => {
-            const response = await fetch('/api/message', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ messages: [message]}),
-            })
-            
-            return response.body
+          const response = await fetch('/api/message', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({messages: [message]}),
+          })
+          console.log(response);   // ----- 
+          return response.body
         },
         onSuccess: () => {
             console.log("Success");
