@@ -37,7 +37,7 @@ export async function OpenAIStream(payload: OpenAIStreamPayload){
 
     // const json = await res.json();
     // if (json.choices && json.choices[0] && json.choices[0].delta?.content) {
-    //   const text = json.choices[0].delta.content;
+    //     const text = json.choices[0].delta.content;
     //   console.log(text);
     // }
   
@@ -46,61 +46,53 @@ export async function OpenAIStream(payload: OpenAIStreamPayload){
     const stream = new ReadableStream({
         async start(controller) {
             console.log("Redable stream fetching started")
+            function onParse(event: ParsedEvent | ReconnectInterval){
+                console.log("event", event)
+                if(event.type === 'event'){
+            console.log("In between event type")
 
-            
+                    const data = event.data;
+                    if(data === '[DONE]'){
+            console.log("Closing because you are done")
 
+                        controller.close();
+                        return;
+                    }
 
-
-
-
-
-
-            // function onParse(event: ParsedEvent | ReconnectInterval){
-            //     console.log("event", event)
-            //     if(event.type === 'event'){
-            // console.log("In between event type")
-
-            //         const data = event.data;
-            //         if(data === '[DONE]'){
-            // console.log("Closing because you are done")
-
-            //             controller.close();
-            //             return;
-            //         }
-
-            //         try {
-            //             console.log("Destructuring started")
+                    try {
+                        console.log("Destructuring started")
                         
-            //             const json = JSON.parse(data)
-            //             console.log('json', json)
-            //             const text = json.choices[0].delta?.content || ''
-            //             console.log('text', text)
+                        const json = JSON.parse(data)
+                        console.log('json', json)
+                        const text = json.choices[0].delta?.content || ''
+                        console.log('text', text)
 
-            //             console.log("Destructuring Ended")
+                        console.log("Destructuring Ended")
 
 
-            //             if(counter < 2 && (text.match(/n/) || []).length){
-            //                 return
-            //             }
+                        if(counter < 2 && (text.match(/n/) || []).length){
+                            return
+                        }
 
-            //             const  queue = encoder.encode(text);
-            //             controller.enqueue(queue);
+                        const  queue = encoder.encode(text);
+                        controller.enqueue(queue);
 
-            //             counter++;
+                        counter++;
 
-            //             console.log(queue)
+                        console.log(queue)
 
-            //         } catch (error) {
-            //             controller.error(error)
-            //         }
-            //     }
-            // }
+                    } catch (error) {
+                        controller.error(error)
+                    }
+                }
+            }
 
-            // const parser = createParser(onParse);
 
-            // for await (const chunk of res.body as any){
-            //     parser.feed(decoder.decode(chunk))
-            // } 
+            const parser = createParser(onParse);
+
+            for await (const chunk of res.body as any){
+                parser.feed(decoder.decode(chunk))
+            } 
             
 
         },
